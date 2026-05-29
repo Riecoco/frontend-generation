@@ -1,6 +1,6 @@
 <template>
   <component :is="tag" :class="classes">
-    <slot></slot>
+    <slot>{{ text }}</slot>
   </component>
 </template>
 
@@ -8,6 +8,10 @@
 import { computed } from 'vue';
 
 const props = defineProps({
+  text: {
+    type: String,
+    default: '',
+  },
   as: {
     type: String,
     default: 'p',
@@ -26,7 +30,7 @@ const props = defineProps({
   color: {
     type: String,
     default: 'default',
-    validator: (value) => ['default', 'muted', 'primary', 'secondary'].includes(value),
+    validator: (value) => ['default', 'muted', 'primary', 'secondary', 'destructive', 'success'].includes(value),
   },
 });
 
@@ -48,10 +52,12 @@ const classes = computed(() => {
   };
   
   const colors = {
-    default: 'text-gray-900',
-    muted: 'text-gray-600',
-    primary: 'text-blue-600',
-    secondary: 'text-purple-600',
+    default: 'text-foreground',
+    muted: 'text-muted-foreground',
+    primary: 'text-primary',
+    secondary: 'text-secondary-foreground',
+    destructive: 'text-destructive',
+    success: "text-success",
   };
   
   return `${sizes[props.size]} ${weights[props.weight]} ${colors[props.color]}`;

@@ -11,33 +11,33 @@ const props = defineProps({
   variant: {
     type: String,
     default: 'default',
-    validator: (value) => ['default', 'primary', 'secondary', 'success', 'warning', 'danger'].includes(value),
+    validator: (value) => ['default', 'secondary', 'success', 'warning', 'danger'].includes(value),
   },
   size: {
     type: String,
-    default: 'md',
-    validator: (value) => ['sm', 'md', 'lg'].includes(value),
+    default: 'medium',
+    validator: (value) => ['small', 'medium', 'large'].includes(value),
   },
 });
 
 const classes = computed(() => {
-  const base = 'inline-flex items-center font-medium rounded-full';
-  
-  const variants = {
-    default: 'bg-gray-100 text-gray-800',
-    primary: 'bg-blue-100 text-blue-800',
-    secondary: 'bg-purple-100 text-purple-800',
-    success: 'bg-green-100 text-green-800',
-    warning: 'bg-yellow-100 text-yellow-800',
-    danger: 'bg-red-100 text-red-800',
+  const baseClasses =
+      'inline-flex items-center justify-center gap-1.5 rounded-full border font-bold w-fit whitespace-nowrap shrink-0 [&>svg]:pointer-events-none [&>svg]:size-4 [&>svg]:shrink-0';
+
+  const variantClasses = {
+    default: 'bg-primary/10 text-primary border-primary/20',
+    secondary: 'bg-secondary text-secondary-foreground border-border',
+    success: 'bg-green-100/50 text-green-700 border-green-200',
+    warning: 'bg-yellow-100/50 text-yellow-700 border-yellow-200',
+    danger: 'bg-red-100/50 text-red-700 border-red-200',
   };
   
-  const sizes = {
-    sm: 'px-2 py-0.5 text-xs',
-    md: 'px-3 py-1 text-sm',
-    lg: 'px-4 py-1.5 text-base',
+  const sizeClasses = {
+    small: 'px-2 py-0.5 text-xs',
+    medium: 'px-3 py-1.5 text-xs',
+    large: 'px-4 py-2 text-sm',
   };
-  
-  return `${base} ${variants[props.variant]} ${sizes[props.size]}`;
+
+  return `${baseClasses} ${variantClasses[props.variant]} ${sizeClasses[props.size]}`;
 });
 </script>

@@ -5,6 +5,9 @@ export default {
   component: Text,
   tags: ['autodocs'],
   argTypes: {
+    text: {
+      control: 'text',
+    },
     as: {
       control: { type: 'select' },
       options: ['p', 'span', 'div', 'label'],
@@ -19,22 +22,57 @@ export default {
     },
     color: {
       control: { type: 'select' },
-      options: ['default', 'muted', 'primary', 'secondary'],
+      options: ['default', 'muted', 'primary', 'secondary', 'destructive'],
     },
   },
-};
-
-export const Default = {
   args: {
-    children: 'This is default text',
+    text: 'This is default text',
+    as: 'p',
+    size: 'base',
+    weight: 'normal',
+    color: 'default',
   },
   render: (args) => ({
     components: { Text },
     setup() {
       return { args };
     },
-    template: '<Text v-bind="args">This is default text</Text>',
+    template: `
+      <Text
+        :as="args.as"
+        :size="args.size"
+        :weight="args.weight"
+        :color="args.color"
+      >
+        {{ args.text }}
+      </Text>
+    `,
   }),
+};
+
+export const Default = {};
+
+export const Muted = {
+  args: {
+    text: 'Muted helper text',
+    color: 'muted',
+  },
+};
+
+export const Primary = {
+  args: {
+    text: 'Primary text',
+    color: 'primary',
+    weight: 'medium',
+  },
+};
+
+export const Destructive = {
+  args: {
+    text: 'Error message text',
+    color: 'destructive',
+    size: 'sm',
+  },
 };
 
 export const Sizes = {
@@ -51,6 +89,20 @@ export const Sizes = {
   }),
 };
 
+export const Weights = {
+  render: () => ({
+    components: { Text },
+    template: `
+      <div class="space-y-2">
+        <Text weight="normal">Normal text</Text>
+        <Text weight="medium">Medium text</Text>
+        <Text weight="semibold">Semibold text</Text>
+        <Text weight="bold">Bold text</Text>
+      </div>
+    `,
+  }),
+};
+
 export const Colors = {
   render: () => ({
     components: { Text },
@@ -60,6 +112,7 @@ export const Colors = {
         <Text color="muted">Muted color text</Text>
         <Text color="primary">Primary color text</Text>
         <Text color="secondary">Secondary color text</Text>
+        <Text color="success">Success color text</Text>
       </div>
     `,
   }),
