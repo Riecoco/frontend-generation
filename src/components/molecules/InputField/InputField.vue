@@ -1,12 +1,12 @@
 <template>
   <div class="space-y-2">
-    <MyLabel
+    <Label
         v-if="label"
         :label="label"
         :html-for="id"
     />
 
-    <MyInput
+    <Input
         :id="id"
         :model-value="modelValue"
         :type="type"
@@ -16,34 +16,34 @@
         @update:model-value="onInput"
     />
 
-    <MyText
+    <Text
         v-if="errorMessage"
-        :text="errorMessage"
         size="sm"
         color="destructive"
-    />
+    >
+      {{ errorMessage }}
+    </Text>
 
-    <MyText
+    <Text
         v-else-if="helpText"
-        :text="helpText"
         size="sm"
         color="muted"
-    />
+    >
+      {{ helpText }}
+    </Text>
   </div>
 </template>
 
 <script>
-import MyLabel from "../../atoms/Label/Label.vue";
-import MyInput from "../../atoms/Input/Input.vue";
-import MyText from "../../atoms/Text/Text.vue";
+import { Label, Input, Text } from '../../atoms'
 
 export default {
-  name: "InputField",
+  name: 'InputField',
 
   components: {
-    MyLabel,
-    MyInput,
-    MyText,
+    Label,
+    Input,
+    Text,
   },
 
   props: {
@@ -53,29 +53,29 @@ export default {
     },
     label: {
       type: String,
-      default: "",
+      default: '',
     },
     modelValue: {
       type: [String, Number],
-      default: "",
+      default: '',
     },
     type: {
       type: String,
-      default: "text",
+      default: 'text',
       validator: (value) =>
-          ["text", "email", "password", "number", "tel", "search"].includes(value),
+          ['text', 'email', 'password', 'number', 'tel', 'search'].includes(value),
     },
     placeholder: {
       type: String,
-      default: "",
+      default: '',
     },
     helpText: {
       type: String,
-      default: "",
+      default: '',
     },
     errorMessage: {
       type: String,
-      default: "",
+      default: '',
     },
     disabled: {
       type: Boolean,
@@ -83,18 +83,18 @@ export default {
     },
   },
 
-  emits: ["update:modelValue"],
+  emits: ['update:modelValue'],
 
   computed: {
     hasError() {
-      return Boolean(this.errorMessage);
+      return Boolean(this.errorMessage)
     },
   },
 
   methods: {
     onInput(value) {
-      this.$emit("update:modelValue", value);
+      this.$emit('update:modelValue', value)
     },
   },
-};
+}
 </script>

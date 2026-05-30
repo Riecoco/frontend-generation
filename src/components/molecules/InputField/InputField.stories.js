@@ -1,101 +1,107 @@
-import InputField from "./InputField.vue";
+import InputField from './InputField.vue'
 
 export default {
-    title: "Molecules/InputField",
+    title: 'Molecules/InputField',
     component: InputField,
-    tags: ["autodocs"],
+    tags: ['autodocs'],
     argTypes: {
         id: {
-            control: "text",
+            control: 'text',
         },
         label: {
-            control: "text",
+            control: 'text',
         },
         modelValue: {
-            control: "text",
+            control: 'text',
         },
         type: {
-            control: { type: "select" },
-            options: ["text", "email", "password", "number", "tel", "search"],
+            control: {
+                type: 'select',
+            },
+            options: ['text', 'email', 'password', 'number', 'tel', 'search'],
         },
         placeholder: {
-            control: "text",
+            control: 'text',
         },
         helpText: {
-            control: "text",
+            control: 'text',
         },
         errorMessage: {
-            control: "text",
+            control: 'text',
         },
         disabled: {
-            control: "boolean",
+            control: 'boolean',
         },
     },
     args: {
-        id: "email",
-        label: "Email address",
-        modelValue: "",
-        type: "email",
-        placeholder: "Enter your email",
-        helpText: "",
-        errorMessage: "",
+        id: 'email',
+        label: 'Email address',
+        modelValue: '',
+        type: 'email',
+        placeholder: 'Enter your email',
+        helpText: '',
+        errorMessage: '',
         disabled: false,
     },
     render: (args) => ({
-        components: { InputField },
+        components: {
+            InputField,
+        },
         setup() {
-            return { args };
+            return {
+                args,
+            }
         },
         template: `
-      <div class="max-w-sm">
-        <InputField
-          v-model="args.modelValue"
-          :id="args.id"
-          :label="args.label"
-          :type="args.type"
-          :placeholder="args.placeholder"
-          :help-text="args.helpText"
-          :error-message="args.errorMessage"
-          :disabled="args.disabled"
-        />
-      </div>
-    `,
+          <div class="max-w-sm">
+            <InputField
+                v-model="args.modelValue"
+                :id="args.id"
+                :label="args.label"
+                :type="args.type"
+                :placeholder="args.placeholder"
+                :help-text="args.helpText"
+                :error-message="args.errorMessage"
+                :disabled="args.disabled"
+            />
+          </div>
+        `,
     }),
-};
+}
 
 export const Default = {
     args: {
-        id: "email",
-        label: "Email address",
-        type: "email",
-        placeholder: "Enter your email",
+        id: 'email',
+        label: 'Email address',
+        type: 'email',
+        placeholder: 'Enter your email',
     },
-};
+}
 
 export const WithHelpText = {
     args: {
-        id: "iban",
-        label: "IBAN",
-        placeholder: "Enter IBAN",
-        helpText: "Use the full IBAN number.",
+        id: 'iban',
+        label: 'IBAN',
+        placeholder: 'Enter IBAN',
+        helpText: 'Use the full IBAN number.',
     },
-};
+}
 
 export const WithError = {
     args: {
-        id: "password",
-        label: "Password",
-        type: "password",
-        placeholder: "Enter password",
-        errorMessage: "Password is required.",
+        id: 'password',
+        label: 'Password',
+        type: 'password',
+        placeholder: 'Enter password',
+        errorMessage: 'Password is required.',
     },
-};
+}
 
 export const Disabled = {
     args: {
-        id: "disabled",
-        label: "Disabled field",
-        placeholder: "Disabled input",
+        id: 'disabled',
+        label: 'Disabled field',
+        placeholder: 'Disabled input',
         disabled: true,
     },
-};
+}

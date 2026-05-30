@@ -1,42 +1,36 @@
 <template>
   <div class="inline-flex items-center gap-2">
-    <MyText
-        :text="`${label}:`"
+    <Text
         as="span"
         size="sm"
         weight="semibold"
         color="muted"
-    />
+    >
+      {{ label }}:
+    </Text>
 
-    <MyText
-        :text="value"
+    <Text
         as="span"
         size="sm"
         weight="medium"
         color="muted"
-    />
+    >
+      {{ value }}
+    </Text>
   </div>
 </template>
 
-<script>
-import MyText from "../../atoms/Text/Text.vue";
+<script setup>
+import { Text } from '../../atoms'
 
-export default {
-  name: "InfoRow",
-
-  components: {
-    MyText,
+defineProps({
+  label: {
+    type: String,
+    required: true,
   },
-
-  props: {
-    label: {
-      type: String,
-      required: true,
-    },
-    value: {
-      type: [String, Number],
-      required: true,
-    },
+  value: {
+    type: [String, Number],
+    required: true,
   },
-};
+})
 </script>

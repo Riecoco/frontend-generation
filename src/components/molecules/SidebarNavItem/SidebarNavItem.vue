@@ -11,13 +11,14 @@
     />
 
     <span class="truncate">
-      {{ label }}
-    </span>
+  {{ label }}
+</span>
   </button>
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed } from 'vue'
+import { Text } from '../../atoms'
 
 const props = defineProps({
   label: {
@@ -32,14 +33,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-});
+})
 
-defineEmits(["select"]);
+defineEmits(['select'])
 
 const classes = computed(() => [
-  "flex w-full items-center justify-start gap-3 rounded-xl px-4 py-3 text-left transition-all",
+  'flex w-full items-center justify-start gap-3 rounded-xl px-4 py-3 text-left transition-all',
   props.active
-      ? "bg-primary/10 text-sidebar-primary font-bold"
-      : "text-sidebar-foreground font-medium hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-]);
+      ? 'bg-primary/10 text-sidebar-primary font-bold'
+      : 'text-sidebar-foreground font-medium hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+])
 </script>

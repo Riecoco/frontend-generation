@@ -1,11 +1,14 @@
 <template>
-  <component :is="tag" :class="classes">
+  <component
+      :is="tag"
+      :class="classes"
+  >
     <slot>{{ text }}</slot>
   </component>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed } from 'vue'
 
 const props = defineProps({
   text: {
@@ -35,9 +38,9 @@ const props = defineProps({
     validator: (value) =>
         ['default', 'muted', 'primary', 'secondary'].includes(value),
   },
-});
+})
 
-const tag = computed(() => `h${props.level}`);
+const tag = computed(() => `h${props.level}`)
 
 const classes = computed(() => {
   const defaultSizes = {
@@ -47,7 +50,7 @@ const classes = computed(() => {
     4: 'text-lg',
     5: 'text-base',
     6: 'text-sm',
-  };
+  }
 
   const sizes = {
     auto: defaultSizes[props.level],
@@ -57,7 +60,7 @@ const classes = computed(() => {
     xl: 'text-xl',
     '2xl': 'text-2xl',
     '3xl': 'text-3xl',
-  };
+  }
 
   const defaultWeights = {
     1: 'font-bold',
@@ -66,22 +69,27 @@ const classes = computed(() => {
     4: 'font-semibold',
     5: 'font-medium',
     6: 'font-medium',
-  };
+  }
 
   const weights = {
     auto: defaultWeights[props.level],
     medium: 'font-medium',
     semibold: 'font-semibold',
     bold: 'font-bold',
-  };
+  }
 
   const colors = {
     default: 'text-foreground',
     muted: 'text-muted-foreground',
     primary: 'text-primary',
     secondary: 'text-secondary-foreground',
-  };
+  }
 
-  return `${sizes[props.size]} ${weights[props.weight]} ${colors[props.color]} tracking-tight`;
-});
+  return [
+    sizes[props.size],
+    weights[props.weight],
+    colors[props.color],
+    'tracking-tight',
+  ].join(' ')
+})
 </script>

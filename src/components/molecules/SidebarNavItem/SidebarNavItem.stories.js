@@ -1,33 +1,37 @@
-import { ref } from "vue";
+import { ref } from 'vue'
 import {
     Users,
     UserCheck,
     ArrowLeftRight,
     Receipt,
-} from "lucide-vue-next";
-import SidebarNavItem from "./SidebarNavItem.vue";
+} from 'lucide-vue-next'
+import SidebarNavItem from './SidebarNavItem.vue'
 
 export default {
-    title: "Molecules/SidebarNavItem",
+    title: 'Molecules/SidebarNavItem',
     component: SidebarNavItem,
-    tags: ["autodocs"],
+    tags: ['autodocs'],
     argTypes: {
         label: {
-            control: "text",
+            control: 'text',
         },
         active: {
-            control: "boolean",
+            control: 'boolean',
         },
     },
     args: {
-        label: "Customers",
+        label: 'Customers',
         icon: Users,
         active: false,
     },
     render: (args) => ({
-        components: { SidebarNavItem },
+        components: {
+            SidebarNavItem,
+        },
         setup() {
-            return { args };
+            return {
+                args,
+            }
         },
         template: `
           <div class="w-72 bg-sidebar p-4">
@@ -39,54 +43,56 @@ export default {
           </div>
         `,
     }),
-};
+}
 
-export const Default = {};
+export const Default = {}
 
 export const Active = {
     args: {
         active: true,
     },
-};
+}
 
 export const EmployeeItems = {
     render: () => ({
-        components: { SidebarNavItem },
+        components: {
+            SidebarNavItem,
+        },
         setup() {
             const items = [
                 {
-                    key: "customers",
-                    label: "Customers",
+                    key: 'customers',
+                    label: 'Customers',
                     icon: Users,
                 },
                 {
-                    key: "pending-approvals",
-                    label: "Pending Approvals",
+                    key: 'pending-approvals',
+                    label: 'Pending Approvals',
                     icon: UserCheck,
                 },
                 {
-                    key: "transfer",
-                    label: "Transfer",
+                    key: 'transfer',
+                    label: 'Transfer',
                     icon: ArrowLeftRight,
                 },
                 {
-                    key: "all-transactions",
-                    label: "All Transactions",
+                    key: 'all-transactions',
+                    label: 'All Transactions',
                     icon: Receipt,
                 },
-            ];
+            ]
 
-            const activeKey = ref("customers");
+            const activeKey = ref('customers')
 
             const selectItem = (key) => {
-                activeKey.value = key;
-            };
+                activeKey.value = key
+            }
 
             return {
                 items,
                 activeKey,
                 selectItem,
-            };
+            }
         },
         template: `
           <div class="w-72 space-y-2 bg-sidebar p-4">
@@ -101,4 +107,4 @@ export const EmployeeItems = {
           </div>
         `,
     }),
-};
+}

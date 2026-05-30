@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { ref } from 'vue'
 import {
     Home,
     Wallet,
@@ -8,160 +8,160 @@ import {
     Users,
     UserCheck,
     Receipt,
-} from "lucide-vue-next";
-import Sidebar from "./Sidebar.vue";
+} from 'lucide-vue-next'
+import Sidebar from './Sidebar.vue'
 
 const customerApprovedItems = [
     {
-        key: "overview",
-        label: "Overview",
+        key: 'overview',
+        label: 'Overview',
         icon: Home,
     },
     {
-        key: "accounts",
-        label: "Accounts",
+        key: 'accounts',
+        label: 'Accounts',
         icon: Wallet,
     },
     {
-        key: "transactions",
-        label: "Transactions",
+        key: 'transactions',
+        label: 'Transactions',
         icon: CreditCard,
     },
     {
-        key: "transfer",
-        label: "Transfer",
+        key: 'transfer',
+        label: 'Transfer',
         icon: ArrowLeftRight,
     },
     {
-        key: "atm",
-        label: "ATM",
+        key: 'atm',
+        label: 'ATM',
         icon: Landmark,
     },
-];
+]
 
 const employeeItems = [
     {
-        key: "customers",
-        label: "Customers",
+        key: 'customers',
+        label: 'Customers',
         icon: Users,
     },
     {
-        key: "pending-approvals",
-        label: "Pending Approvals",
+        key: 'pending-approvals',
+        label: 'Pending Approvals',
         icon: UserCheck,
     },
     {
-        key: "transfer",
-        label: "Transfer",
+        key: 'transfer',
+        label: 'Transfer',
         icon: ArrowLeftRight,
     },
     {
-        key: "all-transactions",
-        label: "All Transactions",
+        key: 'all-transactions',
+        label: 'All Transactions',
         icon: Receipt,
     },
-];
+]
 
 export default {
-    title: "Organisms/Sidebar",
+    title: 'Organisms/Sidebar',
     component: Sidebar,
-    tags: ["autodocs"],
-};
+    tags: ['autodocs'],
+    parameters: {
+        layout: 'fullscreen',
+    },
+}
 
 export const CustomerApproved = {
     render: () => ({
         components: { Sidebar },
         setup() {
-            const activeKey = ref("overview");
+            const activeKey = ref('overview')
 
             const selectItem = (key) => {
-                activeKey.value = key;
-            };
+                activeKey.value = key
+            }
 
             return {
                 customerApprovedItems,
                 activeKey,
                 selectItem,
-            };
+            }
         },
         template: `
-      <Sidebar
-        user-name="Maria Jansen"
-        user-role="Customer"
-        user-initials="MJ"
-        :items="customerApprovedItems"
-        :active-key="activeKey"
-        @select="selectItem"
-        @logout="console.log('Logout clicked')"
-      />
-    `,
+          <Sidebar
+              user-name="Maria Jansen"
+              user-role="Customer"
+              :items="customerApprovedItems"
+              :active-key="activeKey"
+              @select="selectItem"
+              @logout="console.log('Logout clicked')"
+          />
+        `,
     }),
-};
+}
 
 export const CustomerPending = {
     render: () => ({
         components: { Sidebar },
         setup() {
-            const activeKey = ref("overview");
+            const activeKey = ref('overview')
 
             const pendingItems = [
                 {
-                    key: "overview",
-                    label: "Overview",
+                    key: 'overview',
+                    label: 'Overview',
                     icon: Home,
                 },
-            ];
+            ]
 
             const selectItem = (key) => {
-                activeKey.value = key;
-            };
+                activeKey.value = key
+            }
 
             return {
                 pendingItems,
                 activeKey,
                 selectItem,
-            };
+            }
         },
         template: `
-      <Sidebar
-        user-name="Anna de Vries"
-        user-role="Pending customer"
-        user-initials="AV"
-        :items="pendingItems"
-        :active-key="activeKey"
-        @select="selectItem"
-        @logout="console.log('Logout clicked')"
-      />
-    `,
+          <Sidebar
+              user-name="Anna de Vries"
+              user-role="Pending customer"
+              :items="pendingItems"
+              :active-key="activeKey"
+              @select="selectItem"
+              @logout="console.log('Logout clicked')"
+          />
+        `,
     }),
-};
+}
 
 export const Employee = {
     render: () => ({
         components: { Sidebar },
         setup() {
-            const activeKey = ref("customers");
+            const activeKey = ref('customers')
 
             const selectItem = (key) => {
-                activeKey.value = key;
-            };
+                activeKey.value = key
+            }
 
             return {
                 employeeItems,
                 activeKey,
                 selectItem,
-            };
+            }
         },
         template: `
-      <Sidebar
-        user-name="Sophie Bakker"
-        user-role="Employee"
-        user-initials="SB"
-        :items="employeeItems"
-        :active-key="activeKey"
-        @select="selectItem"
-        @logout="console.log('Logout clicked')"
-      />
-    `,
+          <Sidebar
+              user-name="Sophie Bakker"
+              user-role="Employee"
+              :items="employeeItems"
+              :active-key="activeKey"
+              @select="selectItem"
+              @logout="console.log('Logout clicked')"
+          />
+        `,
     }),
-};
+}

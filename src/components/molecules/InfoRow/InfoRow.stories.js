@@ -1,47 +1,51 @@
-import InfoRow from "./InfoRow.vue";
+import InfoRow from './InfoRow.vue'
 
 export default {
-    title: "Molecules/InfoRow",
+    title: 'Molecules/InfoRow',
     component: InfoRow,
-    tags: ["autodocs"],
+    tags: ['autodocs'],
     argTypes: {
         label: {
-            control: "text",
+            control: 'text',
         },
         value: {
-            control: "text",
+            control: 'text',
         },
     },
     args: {
-        label: "BSN",
-        value: "123456789",
+        label: 'BSN',
+        value: '123456789',
     },
     render: (args) => ({
-        components: { InfoRow },
+        components: {
+            InfoRow,
+        },
         setup() {
-            return { args };
+            return {
+                args,
+            }
         },
         template: `
           <InfoRow
-            :label="args.label"
-            :value="args.value"
+              :label="args.label"
+              :value="args.value"
           />
         `,
     }),
-};
+}
 
-export const Default = {};
+export const Default = {}
 
 export const BsnNumber = {
     args: {
-        label: "BSN",
-        value: "123456789",
+        label: 'BSN',
+        value: '123456789',
     },
-};
+}
 
 export const PhoneNumber = {
     args: {
-        label: "Phone",
-        value: "0612345678",
+        label: 'Phone',
+        value: '0612345678',
     },
-};
+}

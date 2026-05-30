@@ -2,18 +2,28 @@
   <aside class="sticky top-0 flex h-screen w-72 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
     <header class="border-b border-sidebar-border p-6">
       <div class="flex items-center gap-3">
-        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-          {{ userInitials }}
-        </div>
+        <BaseAvatar
+            :name="userName"
+            size="md"
+        />
 
         <div class="min-w-0">
-          <p class="truncate font-semibold leading-tight text-sidebar-foreground">
+          <Text
+              as="p"
+              weight="semibold"
+              class="truncate leading-tight text-sidebar-foreground"
+          >
             {{ userName }}
-          </p>
+          </Text>
 
-          <p class="truncate text-xs lowercase text-muted-foreground">
+          <Text
+              as="p"
+              size="xs"
+              color="muted"
+              class="truncate lowercase"
+          >
             {{ userRole }}
-          </p>
+          </Text>
         </div>
       </div>
     </header>
@@ -37,30 +47,40 @@
           <Cloud class="h-5 w-5 text-primary-foreground" />
         </div>
 
-        <span class="text-xl font-bold tracking-tight text-sidebar-foreground">
+        <Text
+            as="span"
+            size="lg"
+            weight="bold"
+            class="tracking-tight text-sidebar-foreground"
+        >
           CloudBank
-        </span>
+        </Text>
       </div>
 
-      <button
-          type="button"
-          class="flex h-11 w-full items-center justify-center gap-2 rounded-full border border-sidebar-border bg-card px-4 text-sm font-medium text-sidebar-foreground transition-colors duration-200 hover:bg-sidebar-accent"
+      <Button
+          variant="outline"
+          class="w-full border-sidebar-border bg-card text-sidebar-foreground hover:bg-sidebar-accent"
           title="Logout"
           @click="$emit('logout')"
       >
         <LogOut class="h-5 w-5 shrink-0 text-sidebar-foreground" />
 
-        <span class="font-semibold">
+        <Text
+            as="span"
+            weight="semibold"
+            class="text-sidebar-foreground"
+        >
           Logout
-        </span>
-      </button>
+        </Text>
+      </Button>
     </footer>
   </aside>
 </template>
 
 <script setup>
-import { Cloud, LogOut } from "lucide-vue-next";
-import SidebarNavItem from "../../molecules/SidebarNavItem/SidebarNavItem.vue";
+import { Cloud, LogOut } from 'lucide-vue-next'
+import { BaseAvatar, Button, Text } from '../../atoms'
+import { SidebarNavItem } from '../../molecules'
 
 defineProps({
   userName: {
@@ -68,10 +88,6 @@ defineProps({
     required: true,
   },
   userRole: {
-    type: String,
-    required: true,
-  },
-  userInitials: {
     type: String,
     required: true,
   },
@@ -83,7 +99,7 @@ defineProps({
     type: String,
     required: true,
   },
-});
+})
 
-defineEmits(["select", "logout"]);
+defineEmits(['select', 'logout'])
 </script>
