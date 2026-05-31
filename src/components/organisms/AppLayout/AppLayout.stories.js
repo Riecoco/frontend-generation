@@ -4,7 +4,7 @@ import {
     Receipt,
     Settings,
     User,
-} from 'lucide-vue-next'
+} from '@lucide/vue'
 
 import AppLayout from './AppLayout.vue'
 import { Card, CardContent, CardHeader, CardTitle } from '../../molecules'

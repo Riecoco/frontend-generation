@@ -4,7 +4,7 @@ import {
     UserCheck,
     ArrowLeftRight,
     Receipt,
-} from 'lucide-vue-next'
+} from '@lucide/vue'
 import SidebarNavItem from './SidebarNavItem.vue'
 
 export default {

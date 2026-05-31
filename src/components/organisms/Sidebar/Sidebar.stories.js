@@ -8,7 +8,7 @@ import {
     Users,
     UserCheck,
     Receipt,
-} from 'lucide-vue-next'
+} from '@lucide/vue'
 import Sidebar from './Sidebar.vue'
 
 const customerApprovedItems = [

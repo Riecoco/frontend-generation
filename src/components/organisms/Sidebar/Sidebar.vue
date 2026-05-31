@@ -78,7 +78,7 @@
 </template>
 
 <script setup>
-import { Cloud, LogOut } from 'lucide-vue-next'
+import { Cloud, LogOut } from '@lucide/vue'
 import { BaseAvatar, Button, Text } from '../../atoms'
 import { SidebarNavItem } from '../../molecules'
 

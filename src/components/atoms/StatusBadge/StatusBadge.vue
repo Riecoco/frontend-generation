@@ -11,7 +11,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { CheckCircle, Clock, X } from 'lucide-vue-next'
+import { CheckCircle, Clock, X } from '@lucide/vue'
 
 const props = defineProps({
   status: {

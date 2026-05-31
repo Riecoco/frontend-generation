@@ -4,7 +4,7 @@ import CardContent from './CardContent.vue'
 import CardTitle from './CardTitle.vue'
 import CardDescription from './CardDescription.vue'
 import CardLabel from './CardLabel.vue'
-import { CreditCard } from 'lucide-vue-next'
+import { CreditCard } from '@lucide/vue'
 import { Text } from '../../atoms'
 
 export default {

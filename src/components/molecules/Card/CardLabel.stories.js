@@ -2,7 +2,7 @@ import CardLabel from './CardLabel.vue'
 import {
     CreditCard,
     PiggyBank,
-} from 'lucide-vue-next'
+} from '@lucide/vue'
 
 export default {
     title: 'Molecules/Card/CardLabel',

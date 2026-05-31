@@ -4,7 +4,7 @@ import {
     ArrowUp,
     CreditCard,
     Wallet,
-} from 'lucide-vue-next'
+} from '@lucide/vue'
 
 export default {
     title: 'Atoms/IconContainer',
