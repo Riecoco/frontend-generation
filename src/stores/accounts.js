@@ -1,7 +1,7 @@
-import {defineStore} from 'pinia'
-import {ref, computed} from 'vue'
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
 import apiClient from '../utils/axios.js'
-import {useAuthStore} from './auth.js'
+import { useAuthStore } from './auth.js'
 
 export const useAccountsStore = defineStore('accounts', () => {
 
@@ -28,7 +28,7 @@ export const useAccountsStore = defineStore('accounts', () => {
 
         try {
             const response = await apiClient.get('/accounts', {
-                params: {page, size}
+                params: { page, size }
             })
             // save accounts to pinia
             accounts.value = response.data
@@ -46,7 +46,7 @@ export const useAccountsStore = defineStore('accounts', () => {
 
         try {
             const response = await apiClient.get('/accounts/user', {
-                params: {userId: authStore.user?.id}
+                params: { userId: authStore.user?.id }
             })
             accounts.value = response.data
         } catch (err) {
@@ -62,7 +62,7 @@ export const useAccountsStore = defineStore('accounts', () => {
 
         try {
             const response = await apiClient.get('/accounts/iban', {
-                params: {iban}
+                params: { iban }
             })
             return response.data
         } catch (err) {
@@ -78,7 +78,7 @@ export const useAccountsStore = defineStore('accounts', () => {
 
         try {
             const response = await apiClient.get('/accounts/search', {
-                params: {firstName, lastName}
+                params: { firstName, lastName }
             })
             accounts.value = response.data
         } catch (err) {
@@ -93,7 +93,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         error.value = null
 
         try {
-            const response = await apiClient.patch(`/accounts/${iban}`, limitsData)
+            const response = await apiClient.patch(`/accounts/${ iban }`, limitsData)
             // update account with new data
             accounts.value = accounts.value.map(account =>
                 account.iban === iban ? response.data : account
@@ -110,7 +110,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         error.value = null
 
         try {
-            await apiClient.patch(`/accounts/${iban}/close`)
+            await apiClient.patch(`/accounts/${ iban} /close`)
             accounts.value = accounts.value.filter(account => account.iban !== iban)
         } catch (err) {
             error.value = err.response?.data || 'Failed to close the account'
