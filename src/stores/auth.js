@@ -33,6 +33,26 @@ async function login(email, password) {
     }
 }
 
+async function register(userData) {
+    loading.value = true
+    error.value = null
+
+    try {
+        const response = await apiClient.post('/auth/register', userData)
+        token.value = response.data
+        setAuthToken(response.data)
+
+        //get the user object
+        const meResponse = await apiClient.get('/auth/me')
+        user.value = meResponse.data
+    } catch (err) {
+        error.value = err.response?.data || 'Registration failed'
+        throw err
+    } finally {
+        loading.value = false
+    }
+}
+
 function logout() {
     token.value = null
     user.value = null
@@ -50,7 +70,7 @@ function initAuth() {
 return {
     token, user, loading, error,
     isLoggedIn, isEmployee, isCustomer,
-    login, logout, initAuth
+    login, register, logout, initAuth
 }
 
 })
