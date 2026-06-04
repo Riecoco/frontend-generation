@@ -26,6 +26,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
         return transactions.value.filter(t => t.fromAccountIban === myIban)
     })
 
+    function getUserId(user) {
+        return user?.id ?? user?.userId ?? user?.customerId
+    }
+
     // Actions
     async function createTransfer(fromAccountIban, toAccountIban, amount, description) {
         loading.value = true
@@ -66,8 +70,18 @@ export const useTransactionsStore = defineStore('transactions', () => {
         error.value = null
 
         try {
+            if (!authStore.user) {
+                await authStore.fetchCurrentUser()
+            }
+
+            const userId = getUserId(authStore.user)
+            if (!userId) {
+                error.value = 'Failed to fetch transactions: missing user ID'
+                return
+            }
+
             const response = await apiClient.get('/transactions/user', {
-                params: { userId: authStore.user?.id }
+                params: { userId }
             })
             transactions.value = response.data
         } catch (err) {

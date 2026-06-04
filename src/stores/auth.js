@@ -33,6 +33,24 @@ async function login(email, password) {
     }
 }
 
+async function fetchCurrentUser() {
+    if (!token.value) return null
+
+    loading.value = true
+    error.value = null
+
+    try {
+        const response = await apiClient.get('/auth/me')
+        user.value = response.data
+        return response.data
+    } catch (err) {
+        error.value = err.response?.data || 'Failed to fetch current user'
+        return null
+    } finally {
+        loading.value = false
+    }
+}
+
 function logout() {
     token.value = null
     user.value = null
@@ -50,7 +68,7 @@ function initAuth() {
 return {
     token, user, loading, error,
     isLoggedIn, isEmployee, isCustomer,
-    login, logout, initAuth
+    login, logout, initAuth, fetchCurrentUser
 }
 
 })

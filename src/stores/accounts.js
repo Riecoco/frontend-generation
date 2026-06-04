@@ -17,9 +17,31 @@ export const useAccountsStore = defineStore('accounts', () => {
     const savingsAccount = computed(() =>
         accounts.value.find(account => account.accountType === 'SAVINGS')
     )
+    const activeAccounts = computed(() =>
+        accounts.value.filter(account => {
+            const rawStatus = account.status ?? account.accountStatus
+            if (!rawStatus) return true
+
+            const status = String(rawStatus).toUpperCase()
+            return status === 'ACTIVE' || status === 'APPROVED'
+        })
+    )
     const totalBalance = computed(() =>
         accounts.value.reduce((sum, account) => sum + account.balance, 0)
     )
+
+    function getUserId(user) {
+        return user?.id ?? user?.userId ?? user?.customerId
+    }
+
+    function normalizeAccounts(payload) {
+        if (Array.isArray(payload)) return payload
+        if (Array.isArray(payload?.content)) return payload.content
+        if (Array.isArray(payload?.accounts)) return payload.accounts
+        if (Array.isArray(payload?.data)) return payload.data
+        if (Array.isArray(payload?._embedded?.accounts)) return payload._embedded.accounts
+        return []
+    }
 
     // Actions
     async function fetchAllAccounts(page = 0, size = 20) {
@@ -31,7 +53,7 @@ export const useAccountsStore = defineStore('accounts', () => {
                 params: { page, size }
             })
             // save accounts to pinia
-            accounts.value = response.data
+            accounts.value = normalizeAccounts(response.data)
         } catch (err) {
             error.value = err.response?.data || 'Failed to fetch accounts'
         } finally {
@@ -45,10 +67,20 @@ export const useAccountsStore = defineStore('accounts', () => {
         error.value = null
 
         try {
+            if (!authStore.user) {
+                await authStore.fetchCurrentUser()
+            }
+
+            const userId = getUserId(authStore.user)
+            if (!userId) {
+                error.value = 'Failed to fetch accounts: missing user ID'
+                return
+            }
+
             const response = await apiClient.get('/accounts/user', {
-                params: { userId: authStore.user?.id }
+                params: { userId }
             })
-            accounts.value = response.data
+            accounts.value = normalizeAccounts(response.data)
         } catch (err) {
             error.value = err.response?.data || 'Failed to fetch accounts'
         } finally {
@@ -80,7 +112,7 @@ export const useAccountsStore = defineStore('accounts', () => {
             const response = await apiClient.get('/accounts/search', {
                 params: { firstName, lastName }
             })
-            accounts.value = response.data
+            accounts.value = normalizeAccounts(response.data)
         } catch (err) {
             error.value = err.response?.data || 'Failed to search accounts'
         } finally {
@@ -127,6 +159,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         // getters
         checkingAccount,
         savingsAccount,
+        activeAccounts,
         totalBalance,
         // actions
         fetchAllAccounts,
