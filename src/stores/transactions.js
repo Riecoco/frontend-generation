@@ -26,6 +26,35 @@ export const useTransactionsStore = defineStore('transactions', () => {
         return transactions.value.filter(t => t.fromAccountIban === myIban)
     })
 
+    function getUserId(user) {
+        return user?.id ?? user?.userId ?? user?.customerId
+    }
+
+    function getErrorMessage(err, fallback) {
+        return err?.response?.data || fallback
+    }
+
+    async function requestAllTransactions(page = 0, size = 20) {
+        const response = await apiClient.get('/transactions/all', {
+            params: { page, size }
+        })
+        return response.data
+    }
+
+    async function requestCustomerTransactions(userId, filters = {}) {
+        const response = await apiClient.get(`/transactions/${ userId }`, {
+            params: { ...filters, page: filters.page ?? 0, size: filters.size ?? 20 }
+        })
+        return response.data
+    }
+
+    function filterTransactionsByUserId(allTransactions, userId) {
+        return allTransactions.filter(transaction => {
+            const ownerId = transaction.userId ?? transaction.customerId ?? transaction.account?.userId ?? transaction.account?.customerId
+            return String(ownerId) === String(userId)
+        })
+    }
+
     // Actions
     async function createTransfer(fromAccountIban, toAccountIban, amount, description) {
         loading.value = true
@@ -48,13 +77,12 @@ export const useTransactionsStore = defineStore('transactions', () => {
         error.value = null
 
         try {
-            const response = await apiClient.get('/transactions/all', {
-                params: { page, size }
-            })
-            // save transactions to pinia
-            transactions.value = response.data
+            const result = await requestAllTransactions(page, size)
+            transactions.value = result
+            return result
         } catch (err) {
-            error.value = err.response?.data || 'Failed to fetch transactions'
+            error.value = getErrorMessage(err, 'Failed to fetch transactions')
+            return null
         } finally {
             loading.value = false
         }
@@ -66,8 +94,18 @@ export const useTransactionsStore = defineStore('transactions', () => {
         error.value = null
 
         try {
+            if (!authStore.user) {
+                await authStore.fetchCurrentUser()
+            }
+
+            const userId = getUserId(authStore.user)
+            if (!userId) {
+                error.value = 'Failed to fetch transactions: missing user ID'
+                return
+            }
+
             const response = await apiClient.get('/transactions/user', {
-                params: { userId: authStore.user?.id }
+                params: { userId }
             })
             transactions.value = response.data
         } catch (err) {
@@ -80,14 +118,14 @@ export const useTransactionsStore = defineStore('transactions', () => {
     async function fetchCustomerTransactions(userId, filters = {}) {
         loading.value = true
         error.value = null
+
         try {
-            // send filters with page number and page size
-            const response = await apiClient.get(`/transactions/${ userId }`, {
-                params: { ...filters, page: filters.page ?? 0, size: filters.size ?? 20 }
-            })
-            transactions.value = response.data
+            const customerTransactions = await requestCustomerTransactions(userId, filters)
+            transactions.value = customerTransactions
+            return transactions.value
         } catch (err) {
-            error.value = err.response?.data || 'Failed to fetch customer transactions'
+            error.value = getErrorMessage(err, 'Failed to fetch customer transactions')
+            return null
         } finally {
             loading.value = false
         }

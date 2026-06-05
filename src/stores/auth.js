@@ -33,25 +33,40 @@ async function login(email, password) {
     }
 }
 
-async function register(userData) {
+async function fetchCurrentUser() {
+    if (!token.value) return null
+
     loading.value = true
     error.value = null
 
     try {
-        const response = await apiClient.post('/auth/register', userData)
-        token.value = response.data
-        setAuthToken(response.data)
-
-        //get the user object
-        const meResponse = await apiClient.get('/auth/me')
-        user.value = meResponse.data
+        const response = await apiClient.get('/auth/me')
+        user.value = response.data
+        return response.data
     } catch (err) {
-        error.value = err.response?.data || 'Registration failed'
-        throw err
+        error.value = err.response?.data || 'Failed to fetch current user'
+        return null
     } finally {
         loading.value = false
     }
 }
+async function register(userData) {
+   try {
+     const response = await apiClient.post('/auth/register', userData)
+          token.value = response.data
+          setAuthToken(response.data)
+
+          //get the user object
+          const meResponse = await apiClient.get('/auth/me')
+          user.value = meResponse.data
+    } catch (err) {
+        error.value = err.response?.data || 'Registration failed'
+        throw err
+    } finally {
+            loading.value = false
+        }
+ } 
+    
 
 function logout() {
     token.value = null
@@ -59,18 +74,20 @@ function logout() {
     setAuthToken(null)
 }
 
-function initAuth() {
+async function initAuth() {
     const savedToken = localStorage.getItem('auth_token')
     if (savedToken) {
         token.value = savedToken
         setAuthToken(savedToken)
+        // populate the `user` from the API when a token is present
+        await fetchCurrentUser()
     }
 }
 
 return {
     token, user, loading, error,
     isLoggedIn, isEmployee, isCustomer,
-    login, register, logout, initAuth
+    login, logout, initAuth, fetchCurrentUser, register
 }
 
 })

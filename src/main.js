@@ -13,6 +13,14 @@ app.use(pinia)
 app.use(router)
 
 const authStore = useAuthStore()
-authStore.initAuth()
 
-app.mount('#app')
+async function bootstrap() {
+	await authStore.initAuth()
+	app.mount('#app')
+
+	// remove the initial loading placeholder if present
+	const loadingEl = document.getElementById('initial-loading')
+	if (loadingEl) loadingEl.remove()
+}
+
+bootstrap()
