@@ -29,6 +29,11 @@ const statusConfig = computed(() => {
       icon: CheckCircle,
       classes: 'border-success/20 bg-success/10 text-success',
     },
+    inactive: {
+      label: 'Inactive',
+      icon: Clock,
+      classes: 'border-muted-foreground/20 bg-muted text-muted-foreground',
+    },
     approved: {
       label: 'Approved',
       icon: CheckCircle,

@@ -12,9 +12,9 @@ const config = {
   /**
    * API Domain - Base URL for API requests
    * @type {string}
-   * @default 'http://localhost'
+   * @default '/api'
    */
-  apiDomain: import.meta.env.VITE_API_DOMAIN || 'http://localhost:8080',
+  apiDomain: import.meta.env.VITE_API_DOMAIN || '/api',
 };
 
 // Freeze config to prevent accidental mutations

@@ -43,49 +43,119 @@ export const useAccountsStore = defineStore('accounts', () => {
         return []
     }
 
+    function getErrorMessage(err, fallback) {
+        return err?.response?.data || fallback
+    }
+
+    async function requestOrNull(request, fallback) {
+        try {
+            return await request()
+        } catch (err) {
+            error.value = getErrorMessage(err, fallback)
+            return null
+        }
+    }
+
+    function filterAccountsByUserId(allAccounts, userId) {
+        return allAccounts.filter(account => {
+            const ownerId = account.userId ?? account.customerId ?? account.ownerId ?? account.user?.id ?? account.customer?.id
+            return String(ownerId) === String(userId)
+        })
+    }
+
+    async function requestAllAccounts(page = 0, size = 20) {
+        const response = await apiClient.get('/accounts', {
+            params: { page, size }
+        })
+        return normalizeAccounts(response.data)
+    }
+
+    async function requestAccountsByUserId(userId) {
+        const response = await apiClient.get('/accounts/user', {
+            params: { userId }
+        })
+        return normalizeAccounts(response.data)
+    }
+
+    async function requestAccountLimitUpdate(iban, limitsData) {
+        const response = await apiClient.patch(`/accounts/${encodeURIComponent(iban)}`, limitsData)
+        return response.data || true
+    }
+
+    function mergeAccountUpdate(iban, updatedAccount, limitsData) {
+        return accounts.value.map(account => {
+            if (account.iban !== iban) return account
+
+            return updatedAccount && typeof updatedAccount === 'object'
+                ? { ...account, ...updatedAccount }
+                : { ...account, ...limitsData }
+        })
+    }
+
     // Actions
     async function fetchAllAccounts(page = 0, size = 20) {
         loading.value = true
         error.value = null
 
-        try {
-            const response = await apiClient.get('/accounts', {
-                params: { page, size }
-            })
-            // save accounts to pinia
-            accounts.value = normalizeAccounts(response.data)
-        } catch (err) {
-            error.value = err.response?.data || 'Failed to fetch accounts'
-        } finally {
-            loading.value = false
+        const result = await requestOrNull(
+            () => requestAllAccounts(page, size),
+            'Failed to fetch accounts'
+        )
+
+        if (result) {
+            accounts.value = result
         }
+
+        loading.value = false
+        return result
     }
 
-    async function fetchAccountsByUserId() {
+    async function fetchAccountsByUserId(userId = null) {
         const authStore = useAuthStore()
         loading.value = true
         error.value = null
 
-        try {
-            if (!authStore.user) {
-                await authStore.fetchCurrentUser()
-            }
-
-            const userId = getUserId(authStore.user)
-            if (!userId) {
-                error.value = 'Failed to fetch accounts: missing user ID'
-                return
-            }
-
-            const response = await apiClient.get('/accounts/user', {
-                params: { userId }
-            })
-            accounts.value = normalizeAccounts(response.data)
-        } catch (err) {
-            error.value = err.response?.data || 'Failed to fetch accounts'
-        } finally {
-            loading.value = false
+        if (!userId && !authStore.user) {
+            await authStore.fetchCurrentUser()
         }
+
+        const resolvedUserId = userId ?? getUserId(authStore.user)
+        if (!resolvedUserId) {
+            error.value = 'Failed to fetch accounts: missing user ID'
+            loading.value = false
+            return null
+        }
+
+        const directAccounts = await requestOrNull(
+            () => requestAccountsByUserId(resolvedUserId),
+            'Failed to fetch accounts'
+        )
+
+        if (directAccounts) {
+            accounts.value = directAccounts
+            loading.value = false
+            return accounts.value
+        }
+
+        if (!userId) {
+            loading.value = false
+            return null
+        }
+
+        const allAccounts = await requestOrNull(
+            () => requestAllAccounts(0, 100),
+            'Failed to fetch accounts'
+        )
+
+        if (!allAccounts) {
+            loading.value = false
+            return null
+        }
+
+        accounts.value = filterAccountsByUserId(allAccounts, resolvedUserId)
+        error.value = null
+        loading.value = false
+        return accounts.value
     }
 
     async function getAccountByIban(iban) {
@@ -124,17 +194,20 @@ export const useAccountsStore = defineStore('accounts', () => {
         loading.value = true
         error.value = null
 
-        try {
-            const response = await apiClient.patch(`/accounts/${ iban }`, limitsData)
-            // update account with new data
-            accounts.value = accounts.value.map(account =>
-                account.iban === iban ? response.data : account
-            )
-        } catch (err) {
-            error.value = err.response?.data || 'Failed to update account limits'
-        } finally {
+        const updatedAccount = await requestOrNull(
+            () => requestAccountLimitUpdate(iban, limitsData),
+            'Failed to update account limits'
+        )
+
+        if (!updatedAccount) {
             loading.value = false
+            return null
         }
+
+        accounts.value = mergeAccountUpdate(iban, updatedAccount, limitsData)
+        error.value = null
+        loading.value = false
+        return updatedAccount
     }
 
     async function closeAccount(iban) {
@@ -142,7 +215,7 @@ export const useAccountsStore = defineStore('accounts', () => {
         error.value = null
 
         try {
-            await apiClient.patch(`/accounts/${ iban} /close`)
+            await apiClient.patch(`/accounts/${encodeURIComponent(iban)}/close`)
             accounts.value = accounts.value.filter(account => account.iban !== iban)
         } catch (err) {
             error.value = err.response?.data || 'Failed to close the account'

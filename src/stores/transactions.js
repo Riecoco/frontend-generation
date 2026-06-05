@@ -30,6 +30,49 @@ export const useTransactionsStore = defineStore('transactions', () => {
         return user?.id ?? user?.userId ?? user?.customerId
     }
 
+    function getErrorMessage(err, fallback) {
+        return err?.response?.data || fallback
+    }
+
+    function normalizeTransactions(payload) {
+        if (Array.isArray(payload)) return payload
+        if (Array.isArray(payload?.content)) return payload.content
+        if (Array.isArray(payload?.transactions)) return payload.transactions
+        if (Array.isArray(payload?.data)) return payload.data
+        if (Array.isArray(payload?._embedded?.transactions)) return payload._embedded.transactions
+        return []
+    }
+
+    async function requestOrNull(request, fallback) {
+        try {
+            return await request()
+        } catch (err) {
+            error.value = getErrorMessage(err, fallback)
+            return null
+        }
+    }
+
+    async function requestAllTransactions(page = 0, size = 20) {
+        const response = await apiClient.get('/transactions/all', {
+            params: { page, size }
+        })
+        return normalizeTransactions(response.data)
+    }
+
+    async function requestCustomerTransactions(userId, filters = {}) {
+        const response = await apiClient.get(`/transactions/${ userId }`, {
+            params: { ...filters, page: filters.page ?? 0, size: filters.size ?? 20 }
+        })
+        return normalizeTransactions(response.data)
+    }
+
+    function filterTransactionsByUserId(allTransactions, userId) {
+        return allTransactions.filter(transaction => {
+            const ownerId = transaction.userId ?? transaction.customerId ?? transaction.account?.userId ?? transaction.account?.customerId
+            return String(ownerId) === String(userId)
+        })
+    }
+
     // Actions
     async function createTransfer(fromAccountIban, toAccountIban, amount, description) {
         loading.value = true
@@ -51,17 +94,17 @@ export const useTransactionsStore = defineStore('transactions', () => {
         loading.value = true
         error.value = null
 
-        try {
-            const response = await apiClient.get('/transactions/all', {
-                params: { page, size }
-            })
-            // save transactions to pinia
-            transactions.value = response.data
-        } catch (err) {
-            error.value = err.response?.data || 'Failed to fetch transactions'
-        } finally {
-            loading.value = false
+        const result = await requestOrNull(
+            () => requestAllTransactions(page, size),
+            'Failed to fetch transactions'
+        )
+
+        if (result) {
+            transactions.value = result
         }
+
+        loading.value = false
+        return result
     }
 
     async function fetchTransactionsByUserId() {
@@ -94,17 +137,32 @@ export const useTransactionsStore = defineStore('transactions', () => {
     async function fetchCustomerTransactions(userId, filters = {}) {
         loading.value = true
         error.value = null
-        try {
-            // send filters with page number and page size
-            const response = await apiClient.get(`/transactions/${ userId }`, {
-                params: { ...filters, page: filters.page ?? 0, size: filters.size ?? 20 }
-            })
-            transactions.value = response.data
-        } catch (err) {
-            error.value = err.response?.data || 'Failed to fetch customer transactions'
-        } finally {
+
+        const customerTransactions = await requestOrNull(
+            () => requestCustomerTransactions(userId, filters),
+            'Failed to fetch customer transactions'
+        )
+
+        if (customerTransactions) {
+            transactions.value = customerTransactions
             loading.value = false
+            return transactions.value
         }
+
+        const allTransactions = await requestOrNull(
+            () => requestAllTransactions(filters.page ?? 0, filters.size ?? 100),
+            'Failed to fetch customer transactions'
+        )
+
+        if (!allTransactions) {
+            loading.value = false
+            return null
+        }
+
+        transactions.value = filterTransactionsByUserId(allTransactions, userId)
+        error.value = null
+        loading.value = false
+        return transactions.value
     }
 
     async function fetchTransactionsByIban(iban, page = 0, size = 20) {

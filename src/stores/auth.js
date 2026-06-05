@@ -57,11 +57,13 @@ function logout() {
     setAuthToken(null)
 }
 
-function initAuth() {
+async function initAuth() {
     const savedToken = localStorage.getItem('auth_token')
     if (savedToken) {
         token.value = savedToken
         setAuthToken(savedToken)
+        // populate the `user` from the API when a token is present
+        await fetchCurrentUser()
     }
 }
 
