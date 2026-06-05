@@ -50,6 +50,23 @@ async function fetchCurrentUser() {
         loading.value = false
     }
 }
+async function register(userData) {
+   try {
+     const response = await apiClient.post('/auth/register', userData)
+          token.value = response.data
+          setAuthToken(response.data)
+
+          //get the user object
+          const meResponse = await apiClient.get('/auth/me')
+          user.value = meResponse.data
+    } catch (err) {
+        error.value = err.response?.data || 'Registration failed'
+        throw err
+    } finally {
+            loading.value = false
+        }
+ } 
+    
 
 function logout() {
     token.value = null
@@ -70,7 +87,7 @@ async function initAuth() {
 return {
     token, user, loading, error,
     isLoggedIn, isEmployee, isCustomer,
-    login, logout, initAuth, fetchCurrentUser
+    login, logout, initAuth, fetchCurrentUser, register
 }
 
 })
