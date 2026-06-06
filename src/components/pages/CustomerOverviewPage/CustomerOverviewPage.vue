@@ -10,7 +10,7 @@
     <div class="max-w-6xl mx-auto space-y-8 py-8">
       <!-- Header -->
       <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold tracking-tight">Account Overview</h1>
+        <Heading :level="1">Account Overview</Heading>
         <Text color="muted" class="mt-2">Welcome back, {{ authStore.user?.firstName }}!</Text>
       </div>
 
@@ -142,7 +142,7 @@ import { useAuthStore } from '../../../stores/auth.js'
 import { useAccountsStore } from '../../../stores/accounts.js'
 import { AppLayout } from '../../organisms'
 import { Card, CardContent } from '../../molecules'
-import { Text } from '../../atoms'
+import { Heading, Text } from '../../atoms'
 import apiClient from '../../../utils/axios.js'
 
 const router = useRouter()
@@ -177,8 +177,8 @@ async function toggleProfile() {
 }
 
 function handleSelect(key) {
-  if (key === 'transfer') router.push('/overview/transfer')
-  if (key === 'accounts') router.push('/overview/accounts')
+  if (key === 'transfer') router.push('/transfer')
+  if (key === 'accounts') router.push('/accounts')
 }
 
 function handleLogout() {

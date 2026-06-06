@@ -42,7 +42,7 @@ const router = createRouter({
       component: CustomerDetail
     },
     {
-      path: '/overview/transfer',
+      path: '/transfer',
       name: 'transfer',
       component: TransferPage
     },
@@ -52,7 +52,7 @@ const router = createRouter({
       component: CustomerOverviewPage
     },
     {
-      path: '/overview/accounts',
+      path: '/accounts',
       name: 'accounts',
       component: AccountsPage
     },

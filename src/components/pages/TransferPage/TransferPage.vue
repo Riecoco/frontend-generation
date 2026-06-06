@@ -33,7 +33,7 @@
         <Card v-if="step === 1" class="overflow-hidden">
           <!-- Amount input -->
           <div class="bg-primary/5 px-8 pt-12 pb-10 flex flex-col items-center border-b border-primary/10">
-            <Label class="text-sm font-bold text-primary uppercase tracking-wider mb-4">How much?</Label>
+            <Label label="How much?" class="text-sm font-bold text-primary uppercase tracking-wider mb-4" />
             <div class="flex items-center justify-center text-primary">
               <span class="text-4xl font-light mr-2 opacity-60">€</span>
               <input
@@ -71,7 +71,7 @@
 
             <!-- From account -->
             <div class="p-4 bg-muted/30 rounded-3xl border border-border">
-              <Label class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3 block ml-2">From</Label>
+              <Label label="From" class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3 block ml-2" />
               <Select v-model="fromAccount">
                 <SelectTrigger class="bg-background border-0 shadow-sm h-14 rounded-2xl text-base px-5">
                   <SelectValue placeholder="Select account..." />
@@ -89,7 +89,7 @@
 
             <!-- To account -->
             <div class="p-4 bg-muted/30 rounded-3xl border border-border">
-              <Label class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3 block ml-2">To</Label>
+              <Label label="To" class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3 block ml-2" />
 
               <!-- Own accounts -->
               <Select v-if="transferType === 'own'" v-model="toAccount">
@@ -176,7 +176,7 @@
         <!-- Step 2 - Confirmation -->
         <Card v-if="step === 2" class="overflow-hidden">
           <div class="bg-primary/5 px-8 pt-12 pb-10 flex flex-col items-center border-b border-primary/10">
-            <Label class="text-sm font-bold text-primary uppercase tracking-wider mb-4">You are sending</Label>
+            <Label label="You are sending" class="text-sm font-bold text-primary uppercase tracking-wider mb-4" />
             <div class="flex items-center justify-center">
               <span class="text-4xl font-light mr-2 opacity-60">€</span>
               <span class="text-5xl font-semibold text-foreground tracking-tight">{{ parseFloat(amount || '0').toFixed(2) }}</span>

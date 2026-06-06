@@ -10,7 +10,7 @@
     <div class="max-w-6xl mx-auto space-y-8 py-8">
       <!-- Header -->
       <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold tracking-tight">My Accounts</h1>
+        <Heading :level="1">My Accounts</Heading>
         <Text color="muted" class="mt-2">View your bank account details and limits</Text>
       </div>
 
@@ -127,7 +127,7 @@ import { useAuthStore } from '../../../stores/auth.js'
 import { useAccountsStore } from '../../../stores/accounts.js'
 import { AppLayout } from '../../organisms'
 import { Card, CardContent } from '../../molecules'
-import { Text } from '../../atoms'
+import { Heading, Text } from '../../atoms'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -152,7 +152,7 @@ const formatCurrency = (amount) => {
 
 function handleSelect(key) {
   if (key === 'overview') router.push('/overview/customer')
-  if (key === 'transfer') router.push('/overview/transfer')
+  if (key === 'transfer') router.push('/transfer')
 }
 
 function handleLogout() {
