@@ -81,15 +81,16 @@ const router = createRouter({
       name: 'employee-transfer',
       component: EmployeeTransferPage,
     },
+    {
       path: '/customer/accounts',
       name: 'accounts',
-      component: AccountsPage
+      component: AccountsPage,
     },
     {
       path: '/customer/transfer',
       name: 'transfer',
-      component: TransferPage
-    }
+      component: TransferPage,
+    },
   ]
 })
 
