@@ -363,7 +363,7 @@ function goBack() {
 function handleSidebarSelect(key: string) {
   const routes: Record<string, string> = {
     customers: '/employee/customers',
-    'pending-approvals': '/employee/pending-approvals',
+    'pending-approvals': '/employee/pending',
     transfer: '/employee/transfer',
     'all-transactions': '/employee/transactions',
   }

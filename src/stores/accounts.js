@@ -17,6 +17,7 @@ export const useAccountsStore = defineStore('accounts', () => {
     const savingsAccount = computed(() =>
         accounts.value.find(account => account.accountType === 'SAVINGS')
     )
+    // filter only active accounts
     const activeAccounts = computed(() =>
         accounts.value.filter(account => {
             const rawStatus = account.status ?? account.accountStatus

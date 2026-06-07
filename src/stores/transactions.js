@@ -10,6 +10,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
     const transactions = ref([])
     const loading = ref(false)
     const error = ref(null)
+    const page = ref(0)
+    const size = ref(20)
+    const totalPages = ref(0)
+    const totalElements = ref(0)
 
     // Getters
     const recentTransactions = computed(() =>
@@ -32,6 +36,22 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
     function getErrorMessage(err, fallback) {
         return err?.response?.data || fallback
+    }
+
+    // normalize backend response - extract array from Page object or return as-is
+    function normalizeTransactions(payload) {
+        if (Array.isArray(payload)) return payload
+        if (Array.isArray(payload?.content)) return payload.content
+        if (Array.isArray(payload?.transactions)) return payload.transactions
+        if (Array.isArray(payload?.data)) return payload.data
+        return []
+    }
+
+    function setPaginationMeta(payload) {
+        page.value = Number(payload?.number ?? 0)
+        size.value = Number(payload?.size ?? 20)
+        totalPages.value = Number(payload?.totalPages ?? 1)
+        totalElements.value = Number(payload?.totalElements ?? normalizeTransactions(payload).length)
     }
 
     async function requestAllTransactions(page = 0, size = 20) {
@@ -67,6 +87,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
             return response.data
         } catch (err) {
             error.value = err.response?.data || 'Failed to create a transfer'
+            throw err
         } finally {
             loading.value = false
         }
@@ -78,7 +99,8 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
         try {
             const result = await requestAllTransactions(page, size)
-            transactions.value = result
+            transactions.value = normalizeTransactions(result)
+            setPaginationMeta(result)
             return result
         } catch (err) {
             error.value = getErrorMessage(err, 'Failed to fetch transactions')
@@ -97,13 +119,11 @@ export const useTransactionsStore = defineStore('transactions', () => {
             if (!authStore.user) {
                 await authStore.fetchCurrentUser()
             }
-
             const userId = getUserId(authStore.user)
             if (!userId) {
                 error.value = 'Failed to fetch transactions: missing user ID'
                 return
             }
-
             const response = await apiClient.get('/transactions/user', {
                 params: { userId }
             })
@@ -121,7 +141,8 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
         try {
             const customerTransactions = await requestCustomerTransactions(userId, filters)
-            transactions.value = customerTransactions
+            transactions.value = normalizeTransactions(customerTransactions)
+            setPaginationMeta(customerTransactions)
             return transactions.value
         } catch (err) {
             error.value = getErrorMessage(err, 'Failed to fetch customer transactions')
@@ -134,14 +155,17 @@ export const useTransactionsStore = defineStore('transactions', () => {
     async function fetchTransactionsByIban(iban, page = 0, size = 20) {
         loading.value = true
         error.value = null
-
         try {
-            const response = await apiClient.get(`/transactions/${ iban }/transactions`, {
+            const response = await apiClient.get(`/transactions/${iban}/transactions`, {
                 params: { page, size }
             })
-            return response.data
+            transactions.value = normalizeTransactions(response.data)
+            totalPages.value = response.data?.totalPages ?? 1
+            totalElements.value = response.data?.totalElements ?? 0
+            return transactions.value
         } catch (err) {
-            error.value = err.response?.data || 'Failed to get transaction by iban'
+            error.value = getErrorMessage(err, 'Failed to get transaction by iban')
+            return null
         } finally {
             loading.value = false
         }
@@ -184,6 +208,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
         transactions,
         loading,
         error,
+        page,
+        size,
+        totalPages,
+        totalElements,
         // getters
         recentTransactions,
         incomingTransactions,

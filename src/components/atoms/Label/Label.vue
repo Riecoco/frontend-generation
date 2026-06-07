@@ -2,9 +2,9 @@
   <label
       data-slot="label"
       :for="htmlFor"
-      :class="classes"
+      :class="[classes, $attrs.class]"
   >
-    {{ label }}
+    <slot>{{ label }}</slot>
   </label>
 </template>
 
@@ -13,11 +13,12 @@ import { computed } from 'vue'
 
 export default {
   name: 'my-label',
+  inheritAttrs: false,
 
   props: {
     label: {
       type: String,
-      required: true,
+      default: '',
     },
     htmlFor: {
       type: String,

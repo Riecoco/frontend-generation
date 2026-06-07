@@ -56,38 +56,12 @@
       </div>
 
       <!-- Recent transactions -->
-      <Card class="overflow-hidden">
-        <div class="bg-primary/5 px-8 pt-8 pb-6 flex flex-col items-center border-b border-primary/10">
-          <p class="text-sm font-bold text-primary uppercase tracking-wider mb-2">History</p>
-          <h2 class="text-2xl font-bold tracking-tight">Recent Transactions</h2>
-        </div>
-        <CardContent class="p-8">
-          <div v-if="recentTransactions.length === 0" class="text-center py-8">
-            <Text color="muted">No transactions yet.</Text>
-          </div>
-          <div v-else class="space-y-3">
-            <div
-                v-for="transaction in recentTransactions"
-                :key="transaction.id"
-                class="flex items-center justify-between p-4 bg-muted/30 rounded-3xl border border-border hover:border-primary/20 transition-colors gap-3"
-            >
-              <div class="flex items-center gap-4">
-                <div :class="['p-3 rounded-2xl flex-shrink-0', transaction.toAccountIban === checkingAccount?.iban ? 'bg-success/10' : 'bg-destructive/10']">
-                  <ArrowDownRight v-if="transaction.toAccountIban === checkingAccount?.iban" class="h-5 w-5 text-success" />
-                  <ArrowUpRight v-else class="h-5 w-5 text-destructive" />
-                </div>
-                <div class="min-w-0">
-                  <p class="font-semibold text-foreground">{{ transaction.description || 'Transfer' }}</p>
-                  <p class="text-sm text-muted-foreground">{{ new Date(transaction.timestamp).toLocaleDateString('nl-NL') }}</p>
-                </div>
-              </div>
-              <p :class="['text-lg font-bold flex-shrink-0', transaction.toAccountIban === checkingAccount?.iban ? 'text-success' : 'text-foreground']">
-                {{ transaction.toAccountIban === checkingAccount?.iban ? '+' : '-' }}{{ formatCurrency(transaction.amount) }}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <TransactionHistory
+          :transactions="recentTransactions"
+          :accounts="accountsStore.accounts"
+          :loading="transactionsStore.loading"
+          :error="transactionsStore.error"
+      />
     </div>
   </AppLayout>
 </template>
@@ -96,11 +70,11 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { Home, ArrowLeftRight, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight } from '@lucide/vue'
+import { Home, ArrowLeftRight, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, ReceiptText} from '@lucide/vue'
 import { useAuthStore } from '../../../stores/auth.js'
 import { useAccountsStore } from '../../../stores/accounts.js'
 import { useTransactionsStore } from '../../../stores/transactions.js'
-import { AppLayout } from '../../organisms'
+import { AppLayout, TransactionHistory } from '../../organisms'
 import { Card, CardContent, CardHeader, CardTitle } from '../../molecules'
 import { Text } from '../../atoms'
 
@@ -112,6 +86,7 @@ const transactionsStore = useTransactionsStore()
 const navItems = [
   { key: 'overview', label: 'Overview', icon: Home },
   { key: 'transfer', label: 'Transfer', icon: ArrowLeftRight },
+  { key: 'transactions', label: 'Transactions', icon: ReceiptText },
 ]
 
 onMounted(async () => {
@@ -121,10 +96,9 @@ onMounted(async () => {
 
 const checkingAccount = computed(() => accountsStore.checkingAccount)
 const savingsAccount = computed(() => accountsStore.savingsAccount)
-const recentTransactions = computed(() => {
-  const content = transactionsStore.transactions?.content
-  return Array.isArray(content) ? content.slice(0, 5) : []
-})
+const recentTransactions = computed(() =>
+    transactionsStore.transactions.slice(0, 5)
+)
 
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(amount)
@@ -132,6 +106,7 @@ const formatCurrency = (amount) => {
 
 function handleSelect(key) {
   if (key === 'transfer') router.push('/overview/transfer')
+  if (key === 'transactions') router.push('/customer/transactions')
 }
 
 function handleLogout() {
