@@ -95,7 +95,7 @@ async function handleLogin() {
 
   if (authStore.isLoggedIn) {
     if (authStore.isEmployee) {
-      router.push('/dashboard/employee')
+      router.push('/employee/customers')
     } else if (authStore.isApproved) {
       router.push('/dashboard/customer')
     } else {
