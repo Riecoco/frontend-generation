@@ -9,6 +9,8 @@ export const useAccountsStore = defineStore('accounts', () => {
     const accounts = ref([])
     const loading = ref(false)
     const error = ref(null)
+    const totalPages = ref(0)
+    const currentPage = ref(0)
 
     // Getters
     const checkingAccount = computed(() =>
@@ -192,6 +194,8 @@ export const useAccountsStore = defineStore('accounts', () => {
         accounts,
         loading,
         error,
+        totalPages,
+        currentPage,
         // getters
         checkingAccount,
         savingsAccount,
