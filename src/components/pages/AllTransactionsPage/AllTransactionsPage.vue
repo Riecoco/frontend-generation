@@ -69,11 +69,10 @@ function handleLogout() {
       <div class="text-center mb-8">
         <Heading :level="1">All Transactions</Heading>
       </div>
-
       <Card>
         <CardContent>
           <TransactionTable
-              :transactions="transactions?.content ?? []"
+              :transactions="transactions ?? []"
               :page="page"
               @prev-page="changePage(-1)"
               @next-page="changePage(1)"

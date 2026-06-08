@@ -183,7 +183,7 @@ async function toggleProfile() {
 function handleSelect(key) {
   const routes = {
     accounts: '/customer/accounts',
-    transactions: '/customer/transactions',
+    transactions: '/customer/my-transactions',
     transfer: '/customer/transfer',
     atm: '/atm',
   }

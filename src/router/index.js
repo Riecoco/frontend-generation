@@ -94,7 +94,7 @@ const router = createRouter({
       component: TransferPage
     },
     {
-      path: '/my-transactions',
+      path: '/customer/my-transactions',
       name: 'my-transactions',
       component: MyTransactionsPage
     },
