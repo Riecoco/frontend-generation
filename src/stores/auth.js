@@ -14,25 +14,33 @@ const isEmployee = computed(() => user.value?.role === 'EMPLOYEE')
 const isCustomer = computed(() => user.value?.role === 'CUSTOMER')
     const isApproved = computed(() => user.value?.status === 'APPROVED')
 
-async function login(email, password) {
-    loading.value = true
-    error.value = null
+    // Safe display name for use in templates
+    const displayName = computed(() => {
+        if (!user.value) return ''
+        const full = [user.value.firstName, user.value.lastName].filter(Boolean).join(' ')
+        return full || user.value.email || ''
+    })
 
-    try {
-        //get token as string
-        const response = await apiClient.post('/auth/login', { email, password })
-        token.value = response.data
-        setAuthToken(response.data)
+    async function login(email, password) {
+        loading.value = true
+        error.value = null
 
-        //get the user object
-        const meResponse = await apiClient.get('/auth/me')
-        user.value = meResponse.data
-    } catch (err) {
-        error.value = err.response?.data || 'Login failed'
-    } finally {
-        loading.value = false
+        try {
+            const response = await apiClient.post('/auth/login', { email, password })
+            token.value = response.data
+            setAuthToken(response.data)
+
+            const meResponse = await apiClient.get('/auth/me')
+            user.value = meResponse.data
+        } catch (err) {
+            error.value = err.response?.data?.message || 'Invalid username or password.'
+            token.value = null
+            user.value = null
+            setAuthToken(null)
+        } finally {
+            loading.value = false
+        }
     }
-}
 
 async function fetchCurrentUser() {
     if (!token.value) return null
@@ -51,6 +59,7 @@ async function fetchCurrentUser() {
         loading.value = false
     }
 }
+
 async function register(userData) {
    try {
      const response = await apiClient.post('/auth/register', userData)
@@ -88,6 +97,7 @@ async function initAuth() {
     return {
         token, user, loading, error,
         isLoggedIn, isEmployee, isCustomer, isApproved,
+        displayName,
         login, logout, initAuth, fetchCurrentUser, register
     }
 

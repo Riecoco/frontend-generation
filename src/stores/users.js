@@ -83,9 +83,14 @@ export const useUsersStore = defineStore('users', () => {
         try {
             // approve user and create accounts with given limits
             const response = await apiClient.post(`/users/${id}/approve`, accountLimits)
+            users.value = users.value.filter((user) => {
+                const userId = getUserId(user)
+                return String(userId) !== String(id)
+            })
             return response.data
         } catch (err) {
             error.value = err.response?.data || 'Failed to approve user'
+            throw err
         } finally {
             loading.value = false
         }

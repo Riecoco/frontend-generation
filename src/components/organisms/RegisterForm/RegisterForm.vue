@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted  } from 'vue'
 import { useAuthStore } from '../../../stores/auth.js'
 import { Button } from '../../atoms'
 import { InputField } from '../../molecules'
@@ -51,6 +51,10 @@ const phoneNumber = ref('')
 const localError = ref('')
 
 const emit = defineEmits(['register-success'])
+
+onMounted(() => {
+  authStore.error = null
+})
 
 async function handleRegister() {
   if (!firstName.value || !lastName.value || !email.value || !password.value || 

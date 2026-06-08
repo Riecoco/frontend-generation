@@ -11,3 +11,6 @@ export {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '../ui/alert-dialog/index.js'
+export { default as PendingList } from './PendingList/PendingList.vue'
+export { default as CustomerList } from './CustomerList/CustomerList.vue'
+export { default as TransactionHistory } from './TransactionHistory/TransactionHistory.vue'

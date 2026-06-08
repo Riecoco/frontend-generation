@@ -1,9 +1,10 @@
 <template>
   <AppLayout
-      :user-name="authStore.user?.firstName + ' ' + authStore.user?.lastName"
+      :user-name="authStore.displayName"
       user-role="Customer"
       :items="navItems"
       active-key="transfer"
+      @select="handleSelect"
       @logout="handleLogout"
   >
     <div class="max-w-2xl mx-auto w-full space-y-8 py-8">
@@ -33,7 +34,7 @@
         <Card v-if="step === 1" class="overflow-hidden">
           <!-- Amount input -->
           <div class="bg-primary/5 px-8 pt-12 pb-10 flex flex-col items-center border-b border-primary/10">
-            <Label class="text-sm font-bold text-primary uppercase tracking-wider mb-4">How much?</Label>
+            <Label label="How much?" class="text-sm font-bold text-primary uppercase tracking-wider mb-4" />
             <div class="flex items-center justify-center text-primary">
               <span class="text-4xl font-light mr-2 opacity-60">€</span>
               <input
@@ -54,7 +55,7 @@
               <div class="flex bg-muted p-1 rounded-full">
                 <button
                     type="button"
-                    @click="transferType = 'own'; toIban = ''; searchResult = null"
+                    @click="transferType = 'own'; toIban = ''; searchResults = []"
                     :class="['py-2 px-6 rounded-full text-sm font-bold transition-all', transferType === 'own' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground']"
                 >
                   My Accounts
@@ -71,13 +72,17 @@
 
             <!-- From account -->
             <div class="p-4 bg-muted/30 rounded-3xl border border-border">
-              <Label class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3 block ml-2">From</Label>
+              <Label label="From" class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3 block ml-2" />
               <Select v-model="fromAccount">
                 <SelectTrigger class="bg-background border-0 shadow-sm h-14 rounded-2xl text-base px-5">
                   <SelectValue placeholder="Select account..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem v-for="account in transferType === 'other' ? accounts.filter(a => a.accountType === 'CHECKING') : accounts" :key="account.iban" :value="account.iban">
+                  <SelectItem
+                      v-for="account in transferType === 'other' ? accounts.filter(a => a.accountType === 'CHECKING') : accounts"
+                      :key="account.iban"
+                      :value="account.iban"
+                  >
                     <div class="flex justify-between items-center gap-4">
                       <span class="font-semibold">{{ account.accountType === 'CHECKING' ? 'Checking' : 'Savings' }}</span>
                       <span class="text-muted-foreground">{{ formatCurrency(account.balance) }}</span>
@@ -89,7 +94,7 @@
 
             <!-- To account -->
             <div class="p-4 bg-muted/30 rounded-3xl border border-border">
-              <Label class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3 block ml-2">To</Label>
+              <Label label="To" class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3 block ml-2" />
 
               <!-- Own accounts -->
               <Select v-if="transferType === 'own'" v-model="toAccount">
@@ -131,7 +136,6 @@
                   >
                     <Search class="w-4 h-4" /> Search
                   </button>
-
                 </div>
 
                 <div v-if="searchResults.length > 0" class="space-y-2">
@@ -139,7 +143,7 @@
                   <div
                       v-for="account in searchResults"
                       :key="account.iban"
-                      @click="toIban = account.iban; searchResult = account.iban"
+                      @click="toIban = account.iban"
                       :class="['p-4 rounded-2xl border cursor-pointer transition-colors', toIban === account.iban ? 'border-primary bg-primary/5' : 'border-border bg-muted/30 hover:border-primary/50']"
                   >
                     <div class="flex justify-between items-center">
@@ -166,8 +170,8 @@
               />
             </div>
 
-            <Button @click="handleNext" class="w-full h-16 rounded-2xl text-lg font-bold">
-              Review Transfer
+            <Button @click="handleNext" :disabled="validating" class="w-full h-16 rounded-2xl text-lg font-bold">
+              {{ validating ? 'Validating...' : 'Review Transfer' }}
               <ArrowRight class="h-5 w-5 ml-2" />
             </Button>
           </CardContent>
@@ -176,7 +180,7 @@
         <!-- Step 2 - Confirmation -->
         <Card v-if="step === 2" class="overflow-hidden">
           <div class="bg-primary/5 px-8 pt-12 pb-10 flex flex-col items-center border-b border-primary/10">
-            <Label class="text-sm font-bold text-primary uppercase tracking-wider mb-4">You are sending</Label>
+            <Label label="You are sending" class="text-sm font-bold text-primary uppercase tracking-wider mb-4" />
             <div class="flex items-center justify-center">
               <span class="text-4xl font-light mr-2 opacity-60">€</span>
               <span class="text-5xl font-semibold text-foreground tracking-tight">{{ parseFloat(amount || '0').toFixed(2) }}</span>
@@ -230,12 +234,10 @@
   </AppLayout>
 </template>
 
-
-
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowRight, ArrowLeft, Search, CheckCircle, AlertCircle, Home, ArrowLeftRight } from '@lucide/vue'
+import { ArrowRight, ArrowLeft, Search, CheckCircle, AlertCircle, Home, ArrowLeftRight, Wallet, CreditCard, Landmark } from '@lucide/vue'
 import { useAuthStore } from '../../../stores/auth.js'
 import { useAccountsStore } from '../../../stores/accounts.js'
 import { useTransactionsStore } from '../../../stores/transactions.js'
@@ -253,10 +255,12 @@ const transactionsStore = useTransactionsStore()
 
 const navItems = [
   { key: 'overview', label: 'Overview', icon: Home },
+  { key: 'accounts', label: 'Accounts', icon: Wallet },
+  { key: 'transactions', label: 'Transactions', icon: CreditCard },
   { key: 'transfer', label: 'Transfer', icon: ArrowLeftRight },
+  { key: 'atm', label: 'ATM', icon: Landmark },
 ]
 
-// Estado del formulario
 const step = ref(1)
 const transferType = ref('own')
 const fromAccount = ref('')
@@ -264,73 +268,98 @@ const toAccount = ref('')
 const toIban = ref('')
 const amount = ref('')
 const description = ref('')
-
-// Búsqueda por nombre
 const searchFirstName = ref('')
 const searchLastName = ref('')
-const searchResult = ref(null)
+const searchResults = ref([])
+const validating = ref(false)
 
 onMounted(async () => {
-  await accountsStore.fetchAccountsByUserId(authStore.user.id)
+  await accountsStore.fetchAccountsByUserId(authStore.user?.id)
 })
 
-// Computed
 const accounts = computed(() => accountsStore.accounts)
 const selectedFromAccount = computed(() => accounts.value.find(a => a.iban === fromAccount.value))
 const selectedToAccount = computed(() => accounts.value.find(a => a.iban === toAccount.value))
-const searchResults = ref([])
 
-const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(amount)
-}
+const formatCurrency = (value) =>
+    new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(value ?? 0)
 
 async function handleSearch() {
   try {
     const response = await apiClient.get('/accounts/search', {
       params: { firstName: searchFirstName.value, lastName: searchLastName.value }
     })
-    if (response.data && response.data.length > 0) {
-      searchResults.value = response.data.filter(a => a.accountType === 'CHECKING')
-      if (searchResults.value.length > 0) {
-        toast.success(`Found ${searchResults.value.length} account(s)`)
-      } else {
-        toast.error('No checking accounts found for this customer')
-      }
+    const results = Array.isArray(response.data) ? response.data : []
+    searchResults.value = results.filter(a => a.accountType === 'CHECKING')
+
+    if (searchResults.value.length > 0) {
+      toast.success(`Found ${searchResults.value.length} account(s)`)
     } else {
-      searchResults.value = []
-      toast.error('Customer not found')
+      toast.error('No checking accounts found for this customer')
     }
-  } catch (err) {
+  } catch {
     searchResults.value = []
     toast.error('Customer not found')
   }
 }
 
-function handleNext() {
-  if (!amount.value || parseFloat(amount.value) <= 0) {
+// Dutch IBAN format: NL + 2 check digits + INHO + 10 digits
+function isValidDutchIban(iban) {
+  return /^NL\d{2}INHO\d{10}$/.test(iban.replace(/\s/g, '').toUpperCase())
+}
+
+async function handleNext() {
+  const parsedAmount = parseFloat(amount.value)
+
+  if (!amount.value || parsedAmount <= 0) {
     toast.error('Please enter a valid amount.')
-    return
-  }
-  if (selectedFromAccount.value && parseFloat(amount.value) > selectedFromAccount.value.balance) {
-    toast.error('Insufficient balance.')
-    return
-  }
-  if (selectedFromAccount.value && parseFloat(amount.value) > selectedFromAccount.value.dailyLimit) {
-    toast.error(`Amount exceeds your daily limit of ${formatCurrency(selectedFromAccount.value.dailyLimit)}`)
     return
   }
   if (!fromAccount.value) {
     toast.error('Please select an account to transfer from.')
     return
   }
+  if (selectedFromAccount.value && parsedAmount > selectedFromAccount.value.balance) {
+    toast.error('Insufficient balance.')
+    return
+  }
+  if (selectedFromAccount.value?.dailyLimit > 0 && parsedAmount > selectedFromAccount.value.dailyLimit) {
+    toast.error(`Amount exceeds your daily limit of ${formatCurrency(selectedFromAccount.value.dailyLimit)}`)
+    return
+  }
   if (transferType.value === 'own' && !toAccount.value) {
     toast.error('Please select a destination account.')
     return
   }
-  if (transferType.value === 'other' && !toIban.value) {
-    toast.error('Please enter a recipient IBAN.')
-    return
+  if (transferType.value === 'other') {
+    if (!toIban.value) {
+      toast.error('Please enter a recipient IBAN.')
+      return
+    }
+
+    // Validate IBAN format before hitting the backend
+    if (!isValidDutchIban(toIban.value)) {
+      toast.error('Invalid IBAN format. Expected format: NL00INHO0000000000')
+      return
+    }
+
+    // Check that the destination IBAN is a CHECKING account — transfers to SAVINGS are not allowed
+    validating.value = true
+    try {
+      const response = await apiClient.get('/accounts/iban', { params: { iban: toIban.value } })
+      const destinationAccount = response.data
+      if (destinationAccount?.accountType === 'SAVINGS') {
+        toast.error('Transfers to savings accounts are not allowed. Please use a checking account IBAN.')
+        return
+      }
+    } catch {
+      toast.error('The destination IBAN could not be found. Please check the account number.')
+      return
+    } finally {
+      validating.value = false
+    }
   }
+
   step.value = 2
 }
 
@@ -347,21 +376,35 @@ async function handleSubmit() {
     toast.success('Transfer completed successfully!', {
       description: `Transferred ${formatCurrency(parseFloat(amount.value))}`
     })
-    // Reset form
-    step.value = 1
-    fromAccount.value = ''
-    toAccount.value = ''
-    toIban.value = ''
-    amount.value = ''
-    description.value = ''
-    searchFirstName.value = ''
-    searchLastName.value = ''
-    searchResult.value = null
-    // Refresh accounts
-    await accountsStore.fetchAccountsByUserId(authStore.user.id)
+    resetForm()
+    await accountsStore.fetchAccountsByUserId(authStore.user?.id)
   } else {
-    toast.error(transactionsStore.error || 'Transfer failed')
+    const err = transactionsStore.error
+    const message = typeof err === 'string' ? err : err?.message || 'Transfer failed. Please try again.'
+    toast.error(message)
   }
+}
+
+function resetForm() {
+  step.value = 1
+  fromAccount.value = ''
+  toAccount.value = ''
+  toIban.value = ''
+  amount.value = ''
+  description.value = ''
+  searchFirstName.value = ''
+  searchLastName.value = ''
+  searchResults.value = []
+}
+
+function handleSelect(key) {
+  const routes = {
+    overview: '/dashboard/customer',
+    accounts: '/customer/accounts',
+    transactions: '/customer/transactions',
+    atm: '/atm',
+  }
+  if (routes[key]) router.push(routes[key])
 }
 
 function handleLogout() {

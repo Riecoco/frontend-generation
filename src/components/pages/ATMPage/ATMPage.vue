@@ -195,8 +195,8 @@ import {
   CheckCircle,
   CreditCard,
   Home,
-  List,
-  Send,
+  Landmark,
+  ArrowLeftRight,
   Wallet,
 } from '@lucide/vue'
 import { toast } from 'vue-sonner'
@@ -242,10 +242,10 @@ const quickAmounts = [20, 50, 100, 200]
 
 const sidebarItems = [
   { key: 'overview', label: 'Overview', icon: Home },
-  { key: 'transactions', label: 'Transactions', icon: List },
-  { key: 'transfer', label: 'Transfer', icon: Send },
-  { key: 'atm', label: 'ATM', icon: Wallet },
-  { key: 'accounts', label: 'Accounts', icon: CreditCard },
+  { key: 'accounts', label: 'Accounts', icon: Wallet },
+  { key: 'transactions', label: 'Transactions', icon: CreditCard },
+  { key: 'transfer', label: 'Transfer', icon: ArrowLeftRight },
+  { key: 'atm', label: 'ATM', icon: Landmark },
 ]
 
 const activeAccounts = computed<Account[]>(() => accountsStore.activeAccounts as Account[])
@@ -352,10 +352,10 @@ async function handleSubmit() {
 function handleSidebarSelect(key: string) {
   const routes: Record<string, string> = {
     overview: '/dashboard/customer',
+    accounts: '/customer/accounts',
     transactions: '/customer/transactions',
     transfer: '/customer/transfer',
     atm: '/customer/atm',
-    accounts: '/customer/accounts',
   }
 
   router.push(routes[key] || '/dashboard/customer')

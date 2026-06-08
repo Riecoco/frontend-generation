@@ -1,6 +1,6 @@
 <template>
   <AppLayout
-      :user-name="authStore.user?.firstName + ' ' + authStore.user?.lastName"
+      :user-name="authStore.displayName"
       user-role="Customer"
       :items="navItems"
       active-key="overview"
@@ -55,13 +55,13 @@
               <Text size="xs" weight="bold" color="muted" class="uppercase tracking-widest mb-1">BSN Number</Text>
               <Text weight="semibold">{{ userDetails.bsnNumber }}</Text>
             </div>
-            <div class="p-4 bg-muted/30 rounded-3xl border border-border md:col-span-2">
+            <div v-if="userDetails.address?.addressLine" class="p-4 bg-muted/30 rounded-3xl border border-border md:col-span-2">
               <Text size="xs" weight="bold" color="muted" class="uppercase tracking-widest mb-1">Street Address</Text>
-              <Text weight="semibold">{{ userDetails.address?.addressLine }}</Text>
+              <Text weight="semibold">{{ userDetails.address.addressLine }}</Text>
             </div>
-            <div class="p-4 bg-muted/30 rounded-3xl border border-border">
+            <div v-if="userDetails.address?.postalCode" class="p-4 bg-muted/30 rounded-3xl border border-border">
               <Text size="xs" weight="bold" color="muted" class="uppercase tracking-widest mb-1">Postal Code</Text>
-              <Text weight="semibold">{{ userDetails.address?.postalCode }}</Text>
+              <Text weight="semibold">{{ userDetails.address.postalCode }}</Text>
             </div>
             <div class="p-4 bg-muted/30 rounded-3xl border border-border">
               <Text size="xs" weight="bold" color="muted" class="uppercase tracking-widest mb-1">City</Text>
