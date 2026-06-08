@@ -544,9 +544,9 @@ async function handleCloseAccount(account: Account) {
   const confirmed = window.confirm(`Close account ${account.iban}?`)
   if (!confirmed) return
 
-  const result = await accountsStore.closeAccount(account.iban)
+  await accountsStore.closeAccount(account.iban)
 
-  if (!result && accountsStore.error) {
+  if (accountsStore.error) {
     toast.error(getStoreError(accountsStore.error, 'Failed to close account'))
     return
   }

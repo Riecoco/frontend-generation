@@ -236,7 +236,7 @@ const selectedAccountId = ref('')
 const mode = ref<AtmMode>('menu')
 const amount = ref('')
 const currentAction = ref<AtmAction>('')
-const successTimerId = ref<ReturnType<typeof window.setTimeout> | null>(null)
+const successTimerId = ref<number | null>(null)
 
 const quickAmounts = [20, 50, 100, 200]
 
