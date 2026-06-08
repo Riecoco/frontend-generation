@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Home, ArrowLeftRight, Users, CreditCard, Landmark } from '@lucide/vue'
+import { ArrowLeftRight, Clock, List, Users } from '@lucide/vue'
 import { useAuthStore } from '@/stores/auth.js'
 import { useTransactionsStore } from '@/stores/transactions.js'
 import { AppLayout, TransactionTable } from '../../organisms'
@@ -17,12 +17,18 @@ const { transactions } = storeToRefs(transactionsStore)
 const page = ref(0)
 const size = 20
 
+const employeeName = computed(() => {
+  return [authStore.user?.firstName, authStore.user?.lastName]
+      .filter(Boolean)
+      .join(' ') || 'Employee'
+})
+
 const navItems = [
-  { key: 'overview', label: 'Overview', icon: Home },
   { key: 'customers', label: 'Customers', icon: Users },
-  { key: 'all-transactions', label: 'Transactions', icon: CreditCard },
+  { key: 'pending', label: 'Pending Approvals', icon: Clock },
   { key: 'transfer', label: 'Transfer', icon: ArrowLeftRight },
-  { key: 'atm', label: 'ATM', icon: Landmark },
+  { key: 'transactions', label: 'All Transactions', icon: List },
+  { key: 'accounts', label: 'Accounts', icon: List },
 ]
 
 const fetchTransactions = async () => {
@@ -41,11 +47,11 @@ onMounted(async () => {
 
 function handleSelect(key) {
   const routes = {
-    overview: '/dashboard/employee',
-    customers: '/overview/pending',
-    'all-transactions': '/all-transactions',
-    transfer: '/customer/transfer',
-    atm: '/atm',
+    customers: '/employee/customers',
+    pending: '/employee/pending',
+    transfer: '/employee/transfer',
+    transactions: '/employee/transactions',
+    accounts: '/employee/accounts',
   }
   if (routes[key]) router.push(routes[key])
 }
@@ -58,10 +64,10 @@ function handleLogout() {
 
 <template>
   <AppLayout
-      :user-name="authStore.displayName"
+      :user-name="employeeName"
       user-role="Employee"
       :items="navItems"
-      active-key="all-transactions"
+      active-key="transactions"
       @select="handleSelect"
       @logout="handleLogout"
   >

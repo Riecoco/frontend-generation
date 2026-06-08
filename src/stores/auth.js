@@ -14,7 +14,7 @@ const isEmployee = computed(() => user.value?.role === 'EMPLOYEE')
 const isCustomer = computed(() => user.value?.role === 'CUSTOMER')
     const isApproved = computed(() => user.value?.status === 'APPROVED')
 
-    // Safe display name for use in templates
+    // Safe display name for use in templates, mostly when its null
     const displayName = computed(() => {
         if (!user.value) return ''
         const full = [user.value.firstName, user.value.lastName].filter(Boolean).join(' ')
@@ -84,6 +84,7 @@ function logout() {
     setAuthToken(null)
 }
 
+//to keep the user logged in
 async function initAuth() {
     const savedToken = localStorage.getItem('auth_token')
     if (savedToken) {

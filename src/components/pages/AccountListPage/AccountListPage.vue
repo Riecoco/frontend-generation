@@ -3,7 +3,7 @@
       :user-name="employeeName"
       user-role="Employee"
       :items="navItems"
-      active-key="customers"
+      active-key="accounts"
       @select="handleNavigation"
       @logout="handleLogout"
   >

@@ -314,11 +314,12 @@ import {
   ArrowLeft,
   ArrowLeftRight,
   ArrowUpRight,
+  Clock,
   Edit2,
+  List,
   PiggyBank,
   Receipt,
   Save,
-  UserCheck,
   Users,
   Wallet,
   X,
@@ -326,6 +327,7 @@ import {
 import { toast } from 'vue-sonner'
 import { useAuthStore } from '../../../stores/auth.js'
 import { useAccountsStore } from '../../../stores/accounts.js'
+import { useUsersStore } from '../../../stores/users.js'
 import { Button, Input, StatusBadge } from '../../atoms'
 import { Card, CardContent, Tabs, TabsContent, TabsList, TabsTrigger } from '../../molecules'
 import { Sidebar } from '../../organisms'
@@ -380,6 +382,7 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const accountsStore = useAccountsStore()
+const usersStore = useUsersStore()
 
 const activeTab = ref('accounts')
 const editingAccountIban = ref<string | null>(null)
@@ -410,17 +413,18 @@ const filteredTransactions = computed(() => {
 
 const sidebarItems = [
   { key: 'customers', label: 'Customers', icon: Users },
-  { key: 'pending-approvals', label: 'Pending Approvals', icon: UserCheck },
+  { key: 'pending', label: 'Pending Approvals', icon: Clock },
   { key: 'transfer', label: 'Transfer', icon: ArrowLeftRight },
-  { key: 'all-transactions', label: 'All Transactions', icon: Receipt },
+  { key: 'transactions', label: 'All Transactions', icon: List },
+  { key: 'accounts', label: 'Accounts', icon: List },
 ]
 
 const customerId = computed(() => String(route.params.id || ''))
 
 const customerDisplayName = computed(() => {
-  const user = authStore.user as { firstName?: string; lastName?: string; name?: string; email?: string } | null
+  const user = usersStore.selectedUser as { firstName?: string; lastName?: string; name?: string; email?: string } | null
   const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ')
-  return fullName || user?.name || user?.email || `Customer ID: ${customerId.value}`
+  return fullName || user?.name || user?.email || ''
 })
 
 const userName = computed(() => {
@@ -485,9 +489,10 @@ function goBack() {
 function handleSidebarSelect(key: string) {
   const routes: Record<string, string> = {
     customers: '/employee/customers',
-    'pending-approvals': '/employee/pending',
+    pending: '/employee/pending',
     transfer: '/employee/transfer',
-    'all-transactions': '/employee/transactions',
+    transactions: '/employee/transactions',
+    accounts: '/employee/accounts',
   }
   router.push(routes[key] || CUSTOMER_LIST_ROUTE)
 }
@@ -570,7 +575,10 @@ onMounted(async () => {
   if (!authStore.user) {
     await authStore.fetchCurrentUser()
   }
-  await accountsStore.fetchAccountsByUserId(customerId.value)
+  await Promise.all([
+    usersStore.fetchUserById(customerId.value),
+    accountsStore.fetchAccountsByUserId(customerId.value),
+  ])
   if (accountsStore.error) {
     toast.error(getStoreError(accountsStore.error, 'Failed to load bank accounts'))
   }

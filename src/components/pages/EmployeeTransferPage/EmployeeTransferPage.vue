@@ -30,6 +30,7 @@ const navItems = [
   { key: 'pending', label: 'Pending Approvals', icon: Clock },
   { key: 'transfer', label: 'Transfer', icon: ArrowLeftRight },
   { key: 'transactions', label: 'All Transactions', icon: List },
+  { key: 'accounts', label: 'Accounts', icon: List },
 ]
 
 const step = ref(1)
@@ -79,6 +80,7 @@ function handleNavigation(key) {
     pending: '/employee/pending',
     transfer: '/employee/transfer',
     transactions: '/employee/transactions',
+    accounts: '/employee/accounts',
   }
 
   const routePath = routes[key]
