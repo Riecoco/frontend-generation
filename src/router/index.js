@@ -7,6 +7,8 @@ import CustomerDetail from '../components/pages/CustomerDetails/CustomerDetail.v
 import TransferPage from '../components/pages/TransferPage/TransferPage.vue'
 import CustomerOverviewPage from '../components/pages/CustomerOverviewPage/CustomerOverviewPage.vue'
 import AccountsPage from '../components/pages/AccountsPage/AccountsPage.vue'
+import MyTransactionsPage from "@/components/pages/MyTransactionsPage/MyTransactionsPage.vue";
+import AllTransactionsPage from "@/components/pages/AllTransactionsPage/AllTransactionsPage.vue";
 
 
 const router = createRouter({
@@ -60,6 +62,16 @@ const router = createRouter({
       path: '/customer/transactions',
       name: 'transactions',
       component: TransferPage
+    },
+    {
+      path: '/my-transactions',
+      name: 'my-transactions',
+      component: MyTransactionsPage
+    },
+    {
+      path: '/employee/transactions',
+      name: 'employee-transactions',
+      component: AllTransactionsPage
     }
   ]
 })

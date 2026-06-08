@@ -147,6 +147,24 @@ export const useTransactionsStore = defineStore('transactions', () => {
         }
     }
 
+    async function filterTransactionsForUserId(userId, filters = {}) {
+        loading.value = true
+        error.value = null
+        try {
+            const response = await apiClient.get('/transactions/' + userId, {
+                params: {
+                    ...filters
+                }
+            })
+            transactions.value = response.data?.content ?? []
+        } catch (err) {
+            error.value = getErrorMessage(err, 'Failed to filter transactions')
+            return null
+        } finally {
+            loading.value = false
+        }
+    }
+
     async function withdraw(iban, amount) {
         loading.value = true
         error.value = null
@@ -195,6 +213,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         fetchCustomerTransactions,
         fetchTransactionsByIban,
         withdraw,
-        deposit
+        deposit,
+        filterTransactionsForUserId
     }
 })
