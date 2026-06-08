@@ -93,8 +93,8 @@ const router = createRouter({
       component: TransferPage,
     },
     {
-      path: '/accounts',
-      name: 'accounts',
+      path: '/employee/accounts',
+      name: 'employee-accounts',
       component: AccountListPage
     }
   ]
